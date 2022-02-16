@@ -1,6 +1,6 @@
-# Home Assistant Community Add-on: Example
+# Home Assistant Community Add-on: Gammu
 
-This is an example add-on for Home Assistant. When started, it displays a
+This is an Gammu add-on for Home Assistant. When started, it displays a
 random quote every 5 seconds.
 
 It shows off several features and structures like:

@@ -1,15 +1,36 @@
 ARG BUILD_FROM=ghcr.io/hassio-addons/base/amd64:11.0.1
 # hadolint ignore=DL3006
-FROM ${BUILD_FROM}
+FROM ${BUILD_FROM} AS base
 
 # Copy root filesystem
 COPY rootfs /
 
 # Setup base
-RUN apk add --no-cache \
-    coreutils=9.0-r2 \
-    wget=1.21.2-r2
+RUN echo 'http://dl-cdn.alpinelinux.org/alpine/v3.9/community' >> /etc/apk/repositories \
+    && apk update \
+    && apk add --no-cache python3 pkgconfig gammu=1.39.0-r2 gammu-libs=1.39.0-r2 gammu-dev=1.39.0-r2
 
+#RUN python3 -m pip install -U pip
+
+# Build dependencies in a dedicated stage
+FROM base AS dependencies
+COPY rootfs/requirements.txt .
+RUN apk add --no-cache python3 py3-pip
+RUN apk add --no-cache --virtual .build-deps libffi-dev openssl-dev gcc musl-dev cargo \
+    && pip3 install -r requirements.txt
+
+# Switch back to base layer for final stage
+FROM base AS final
+ENV BASE_PATH /sms-gw
+RUN mkdir $BASE_PATH /ssl
+WORKDIR $BASE_PATH
+COPY rootfs $BASE_PATH
+
+COPY --from=dependencies /root/.cache /root/.cache
+RUN pip3 install -r requirements.txt && rm -rf /root/.cache
+
+# CMD [ "python", "./run.py" ]
+# docker run --name gammu -d -p 5000:5000 --device=/dev/ttyUSB0:/dev/mobile -e PIN="6651" pajikos/sms-gammu-gateway
 # Build arguments
 ARG BUILD_ARCH
 ARG BUILD_DATE
@@ -26,7 +47,7 @@ LABEL \
     io.hass.arch="${BUILD_ARCH}" \
     io.hass.type="addon" \
     io.hass.version=${BUILD_VERSION} \
-    maintainer="Franck Nijhof <frenck@addons.community>" \
+    maintainer="Cayetano <yo@cayetanosm.es>" \
     org.opencontainers.image.title="${BUILD_NAME}" \
     org.opencontainers.image.description="${BUILD_DESCRIPTION}" \
     org.opencontainers.image.vendor="Home Assistant Community Add-ons" \
