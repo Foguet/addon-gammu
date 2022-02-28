@@ -1,7 +1,8 @@
-ARG BUILD_FROM=ghcr.io/hassio-addons/base/amd64:11.0.1
+ARG BUILD_FROM=ghcr.io/hassio-addons/base/aarch64:11.0.1
 # hadolint ignore=DL3006
 FROM ${BUILD_FROM} AS base
-
+# Set shell
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 # Copy root filesystem
 COPY rootfs /
 
@@ -13,21 +14,22 @@ RUN echo 'http://dl-cdn.alpinelinux.org/alpine/v3.9/community' >> /etc/apk/repos
 #RUN python3 -m pip install -U pip
 
 # Build dependencies in a dedicated stage
-FROM base AS dependencies
-COPY rootfs/requirements.txt .
-RUN apk add --no-cache python3 py3-pip
-RUN apk add --no-cache --virtual .build-deps libffi-dev openssl-dev gcc musl-dev cargo \
-    && pip3 install -r requirements.txt
+#FROM base AS dependencies
+# COPY rootfs/sms-gw/requirements.txt .
+RUN apk add --no-cache py3-pip
+RUN apk add --no-cache --virtual .build-deps gcc musl-dev python3-dev libffi-dev openssl-dev cargo
+# RUN pip3 install -r /sms-gw/requirements.txt
 
 # Switch back to base layer for final stage
-FROM base AS final
-ENV BASE_PATH /sms-gw
-RUN mkdir $BASE_PATH /ssl
-WORKDIR $BASE_PATH
-COPY rootfs $BASE_PATH
+#FROM base AS final
+#COPY rootfs /
+# ENV BASE_PATH /sms-gw
+# RUN mkdir -p $BASE_PATH /ssl
+# WORKDIR $BASE_PATH
 
-COPY --from=dependencies /root/.cache /root/.cache
-RUN pip3 install -r requirements.txt && rm -rf /root/.cache
+#COPY --from=dependencies /root/.cache /root/.cache
+#RUN pip3 install -r /sms-gw/requirements.txt 
+#RUN rm -rf /root/.cache
 
 # CMD [ "python", "./run.py" ]
 # docker run --name gammu -d -p 5000:5000 --device=/dev/ttyUSB0:/dev/mobile -e PIN="6651" pajikos/sms-gammu-gateway
@@ -50,8 +52,8 @@ LABEL \
     maintainer="Cayetano <yo@cayetanosm.es>" \
     org.opencontainers.image.title="${BUILD_NAME}" \
     org.opencontainers.image.description="${BUILD_DESCRIPTION}" \
-    org.opencontainers.image.vendor="Home Assistant Community Add-ons" \
-    org.opencontainers.image.authors="Franck Nijhof <frenck@addons.community>" \
+    org.opencontainers.image.vendor="Foguet Add-ons" \
+    org.opencontainers.image.authors="Foguet <foguet@cayetanosm.es>" \
     org.opencontainers.image.licenses="MIT" \
     org.opencontainers.image.url="https://addons.community" \
     org.opencontainers.image.source="https://github.com/${BUILD_REPOSITORY}" \

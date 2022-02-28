@@ -1,0 +1,32 @@
+---
+name: Gammu
+version: 2022.02.22
+slug: gammu
+description: Gammu add-on by Cayetano
+url: https://github.com/Foguet/addon-gammu
+webui: "[PROTO:ssl]://[HOST]:[PORT:5000]/signal"
+startup: system
+init: false
+arch:
+  - aarch64
+  - amd64
+  - armhf
+  - armv7
+  - i386
+map:
+  - ssl
+options:
+  log_level: trace
+  pin: 6651
+  credentials: ./credentials.txt
+schema:
+  log_level: list(trace|debug|info|notice|warning|error|fatal)
+  pin: int(1,9999)
+  credentials: str
+ports:
+  5000/tcp: 5000
+ports_description:
+  5000/tcp: API backend
+devices:
+  - /dev/ttyUSB0
+usb: true

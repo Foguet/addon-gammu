@@ -1,9 +1,10 @@
-import sys
+import sys, os
 
 import gammu
 
+credentials_txt = os.getenv('CREDENTIALS', './credentials.txt')
 
-def load_user_data(filename='credentials.txt'):
+def load_user_data(filename=credentials_txt):
     users = {}
     with open(filename) as credentials:
         for line in credentials:

@@ -1,0 +1,19 @@
+#!/usr/bin/with-contenv bashio
+# ==============================================================================
+# Home Assistant Community Add-on: Example
+# Runs example1 script
+# ==============================================================================
+
+
+bashio::log.info "Starting sms-gw [run]..."
+# Lookup udev link
+#DECONZ_DEVICE=$(bashio::config 'pin')
+#bashio::log.info "PIN ${DECONZ_DEVICE}"
+
+cd /sms-gw
+exec /sms-gw/sms-gw.sh
+#PIN=$(bashio::config 'pin')
+#bashio::log.info "PIN is set to: ${PIN}"
+#export PIN
+
+# python3 /sms-gw/run.py

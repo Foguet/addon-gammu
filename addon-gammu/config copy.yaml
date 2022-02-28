@@ -1,6 +1,6 @@
 ---
 name: Gammu
-version: dev
+version: 2022.02.10
 slug: gammu
 description: Gammu add-on by Cayetano
 url: https://github.com/Foguet/addon-gammu
@@ -19,6 +19,16 @@ options:
 schema:
   log_level: list(trace|debug|info|notice|warning|error|fatal)
   seconds_between_quotes: int(1,120)
-startup: before
+  pin: int(1,9999)
+# startup: before
 ports:
   5000/tcp: 5000
+ports_description:
+  5000/tcp: API backend
+# privileged:
+#   - SYS_RAWIO
+#host_dbus: true
+#devices:
+#  - /dev/ttyUSB0
+#udev: true
+#usb: true
